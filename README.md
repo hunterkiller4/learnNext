@@ -22,10 +22,20 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Features
 
-- Travel blog with SQLite database
+- Travel blog with Netlify DB (serverless Postgres)
 - API routes for managing blog posts
 - Responsive design with Tailwind CSS
 - Deployed on Netlify
+
+## Database Setup
+
+This app uses Netlify DB for the database. To set up:
+
+1. In your Netlify dashboard, enable Netlify DB for your site.
+2. The DATABASE_URL environment variable will be automatically set.
+3. Run `node seed.js` to populate sample data (requires DATABASE_URL set).
+
+For local development, you can set DATABASE_URL to a local Postgres instance or use a service like Neon.
 
 ## Learn More
 
@@ -40,4 +50,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use Netlify.
 
-Connect your GitHub repository to Netlify and deploy.
+Connect your GitHub repository to Netlify and deploy. Enable Netlify DB in the site settings.

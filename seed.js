@@ -1,20 +1,16 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { neon } from '@netlify/neon';
 
-const dbPath = path.join(process.cwd(), 'database.db');
-const db = new Database(dbPath);
+const sql = neon(process.env.DATABASE_URL);
 
 // Create tables if they don't exist
-db.exec(`
-  CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    category TEXT,
-    image_url TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+await sql`CREATE TABLE IF NOT EXISTS posts (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  category TEXT,
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
 
 // Insert sample posts
 const posts = [
@@ -56,10 +52,8 @@ const posts = [
   }
 ];
 
-const insert = db.prepare('INSERT INTO posts (title, content, category, image_url) VALUES (?, ?, ?, ?)');
-
 for (const post of posts) {
-  insert.run(post.title, post.content, post.category, post.image_url);
+  await sql`INSERT INTO posts (title, content, category, image_url) VALUES (${post.title}, ${post.content}, ${post.category}, ${post.image_url})`;
 }
 
 console.log('Sample posts inserted');
