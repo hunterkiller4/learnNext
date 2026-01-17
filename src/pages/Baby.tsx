@@ -809,6 +809,12 @@ const babyTips: BabyTip[] = [
 export default function Baby() {
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
+  // Calculate current month based on start date (August 10, 2025)
+  const startDate = new Date('2025-08-10');
+  const today = new Date('2026-01-17'); // Current date
+  const monthsDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+  const currentMonth = Math.max(1, Math.min(36, monthsDiff + 1)); // Ensure within valid range
+
   const handleMonthClick = (month: number) => {
     setSelectedMonth(selectedMonth === month ? null : month);
   };
@@ -843,12 +849,19 @@ export default function Baby() {
             <button
               key={tip.month}
               onClick={() => handleMonthClick(tip.month)}
-              className={`p-4 rounded-lg border-2 transition-all ${
-                selectedMonth === tip.month
+              className={`p-4 rounded-lg border-2 transition-all relative ${
+                tip.month === currentMonth
+                  ? 'border-green-500 bg-green-50 text-green-700 ring-2 ring-green-200'
+                  : selectedMonth === tip.month
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50'
               }`}
             >
+              {tip.month === currentMonth && (
+                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  Current
+                </div>
+              )}
               <div className="text-center">
                 <div className="text-2xl font-bold">{tip.month}</div>
                 <div className="text-sm text-gray-600">months</div>

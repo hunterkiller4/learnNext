@@ -38,7 +38,7 @@ export default function Admin() {
     script.onload = () => {
       if (window.netlifyIdentity) {
         window.netlifyIdentity.init();
-        window.netlifyIdentity.on('login', (user: NetlifyUser) => setUser(user));
+        window.netlifyIdentity.on('login', (user?: NetlifyUser) => setUser(user || null));
         window.netlifyIdentity.on('logout', () => setUser(null));
         setUser(window.netlifyIdentity.currentUser());
       }
