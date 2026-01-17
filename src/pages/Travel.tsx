@@ -84,6 +84,7 @@ export default function Travel() {
               <Link to="/travel" className="text-blue-600 font-semibold">Travel</Link>
               <Link to="/food" className="text-gray-900 hover:text-gray-600">Food</Link>
               <Link to="/toy" className="text-gray-900 hover:text-gray-600">Toy</Link>
+              <Link to="/baby" className="text-gray-900 hover:text-gray-600">Baby</Link>
               <Link to="/admin" className="text-gray-900 hover:text-gray-600">Admin</Link>
             </nav>
           </div>

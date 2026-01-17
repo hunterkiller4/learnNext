@@ -156,6 +156,7 @@ export default function Admin() {
                 <Link to="/travel" className="text-gray-900 hover:text-gray-600">Travel</Link>
                 <Link to="/food" className="text-gray-900 hover:text-gray-600">Food</Link>
                 <Link to="/toy" className="text-gray-900 hover:text-gray-600">Toy</Link>
+                <Link to="/baby" className="text-gray-900 hover:text-gray-600">Baby</Link>
                 <Link to="/admin" className="text-red-600 font-semibold">Admin</Link>
               </nav>
               <button onClick={logout} className="bg-red-500 text-white px-4 py-2 rounded">
