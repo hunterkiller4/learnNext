@@ -7,16 +7,13 @@ interface Nation {
   flag_url: string;
 }
 
-interface Item {
-  id: number;
-  nation_id: number;
-  name: string;
-  description: string;
-  image_url: string;
+interface NetlifyUser {
+  jwt(): string;
+  [key: string]: unknown;
 }
 
 export default function Admin() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<NetlifyUser | null>(null);
   const [nations, setNations] = useState<Nation[]>([]);
   const [activeTab, setActiveTab] = useState<'nations' | 'items'>('nations');
 
@@ -41,7 +38,7 @@ export default function Admin() {
     script.onload = () => {
       if (window.netlifyIdentity) {
         window.netlifyIdentity.init();
-        window.netlifyIdentity.on('login', (user: any) => setUser(user));
+        window.netlifyIdentity.on('login', (user: NetlifyUser) => setUser(user));
         window.netlifyIdentity.on('logout', () => setUser(null));
         setUser(window.netlifyIdentity.currentUser());
       }
@@ -312,6 +309,12 @@ export default function Admin() {
 // Declare global window
 declare global {
   interface Window {
-    netlifyIdentity: any;
+    netlifyIdentity: {
+      init: () => void;
+      on: (event: string, callback: (user?: NetlifyUser) => void) => void;
+      currentUser: () => NetlifyUser | null;
+      open: () => void;
+      logout: () => void;
+    };
   }
 }

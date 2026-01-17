@@ -15,6 +15,20 @@ const renderWithRouter = (component: React.ReactElement) => {
 }
 
 describe('Home', () => {
+  beforeEach(() => {
+    // Mock successful fetch responses
+    vi.mocked(global.fetch).mockImplementation(() => {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([])
+      } as Response)
+    })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders the main heading', () => {
     renderWithRouter(<Home />)
     expect(screen.getByText('House of Gon')).toBeInTheDocument()
@@ -27,17 +41,21 @@ describe('Home', () => {
 
   it('renders navigation links', () => {
     renderWithRouter(<Home />)
-    expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Travel')).toBeInTheDocument()
-    expect(screen.getByText('Food')).toBeInTheDocument()
-    expect(screen.getByText('Toy')).toBeInTheDocument()
-    expect(screen.getByText('Admin')).toBeInTheDocument()
+    // Check for navigation links in the nav element
+    const nav = screen.getByRole('navigation')
+    expect(nav).toHaveTextContent('Home')
+    expect(nav).toHaveTextContent('Travel')
+    expect(nav).toHaveTextContent('Food')
+    expect(nav).toHaveTextContent('Toy')
+    expect(nav).toHaveTextContent('Baby')
+    expect(nav).toHaveTextContent('Admin')
   })
 
   it('renders tab buttons', () => {
     renderWithRouter(<Home />)
-    expect(screen.getByText('Travel')).toBeInTheDocument()
-    expect(screen.getByText('Food')).toBeInTheDocument()
-    expect(screen.getByText('Toy')).toBeInTheDocument()
+    // Check for tab buttons specifically
+    expect(screen.getByRole('button', { name: 'Travel' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Food' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Toy' })).toBeInTheDocument()
   })
 })
