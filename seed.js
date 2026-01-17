@@ -1,59 +1,110 @@
 import { neon } from '@netlify/neon';
 
-const sql = neon(process.env.DATABASE_URL);
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 // Create tables if they don't exist
-await sql`CREATE TABLE IF NOT EXISTS posts (
+await sql`CREATE TABLE IF NOT EXISTS nations (
   id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  category TEXT,
-  image_url TEXT,
+  name TEXT NOT NULL UNIQUE,
+  flag_url TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )`;
 
-// Insert sample posts
-const posts = [
-  {
-    title: 'Exploring the Hidden Gems of Kyoto',
-    content: 'Kyoto, the ancient capital of Japan, is a city steeped in history and culture. From the serene temples of Kinkaku-ji to the bustling streets of Nishiki Market, there\'s something for everyone. In this post, I\'ll share my favorite spots and tips for making the most of your visit.',
-    category: 'Asia',
-    image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400'
-  },
-  {
-    title: 'A Weekend in Paris: Romance and Cuisine',
-    content: 'Paris, the City of Light, never fails to captivate. This weekend getaway included visits to the Eiffel Tower, a Seine River cruise, and indulging in croissants and escargot at local bistros. Here\'s how to experience the best of Parisian charm.',
-    category: 'Europe',
-    image_url: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400'
-  },
-  {
-    title: 'Hiking the Inca Trail to Machu Picchu',
-    content: 'The Inca Trail is one of the most iconic hikes in the world. Spanning four days and covering 26 miles, it leads to the breathtaking Machu Picchu. I\'ll walk you through preparation, the journey, and the unforgettable views.',
-    category: 'South America',
-    image_url: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=400'
-  },
-  {
-    title: 'Safari Adventures in Kenya',
-    content: 'Kenya\'s wildlife reserves offer incredible safari experiences. From the Maasai Mara to the Amboseli National Park, I witnessed the Big Five and learned about conservation efforts. This post covers the best times to visit and what to expect.',
-    category: 'Africa',
-    image_url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400'
-  },
-  {
-    title: 'Island Hopping in the Greek Isles',
-    content: 'The Greek Islands are a paradise of blue waters and white-washed buildings. My trip included Santorini, Mykonos, and Crete. Discover the best beaches, local foods, and hidden coves in this Mediterranean adventure.',
-    category: 'Europe',
-    image_url: 'https://images.unsplash.com/photo-1501436513145-30f24e19fcc8?w=400'
-  },
-  {
-    title: 'Northern Lights in Iceland',
-    content: 'Chasing the Aurora Borealis in Iceland was a dream come true. From Reykjavik to the Golden Circle, and staying in a glass igloo, this trip was filled with natural wonders. Learn how to plan your own aurora-hunting expedition.',
-    category: 'Europe',
-    image_url: 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=400'
-  }
+await sql`CREATE TABLE IF NOT EXISTS travel_items (
+  id SERIAL PRIMARY KEY,
+  nation_id INTEGER REFERENCES nations(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+
+await sql`CREATE TABLE IF NOT EXISTS food_items (
+  id SERIAL PRIMARY KEY,
+  nation_id INTEGER REFERENCES nations(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+
+await sql`CREATE TABLE IF NOT EXISTS toy_items (
+  id SERIAL PRIMARY KEY,
+  nation_id INTEGER REFERENCES nations(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+
+// Insert sample nations
+const nations = [
+  { name: 'Japan', flag_url: 'https://flagcdn.com/w320/jp.png' },
+  { name: 'France', flag_url: 'https://flagcdn.com/w320/fr.png' },
+  { name: 'Italy', flag_url: 'https://flagcdn.com/w320/it.png' },
+  { name: 'Mexico', flag_url: 'https://flagcdn.com/w320/mx.png' },
+  { name: 'India', flag_url: 'https://flagcdn.com/w320/in.png' },
+  { name: 'Brazil', flag_url: 'https://flagcdn.com/w320/br.png' }
 ];
 
-for (const post of posts) {
-  await sql`INSERT INTO posts (title, content, category, image_url) VALUES (${post.title}, ${post.content}, ${post.category}, ${post.image_url})`;
+for (const nation of nations) {
+  await sql`INSERT INTO nations (name, flag_url) VALUES (${nation.name}, ${nation.flag_url}) ON CONFLICT (name) DO NOTHING`;
 }
 
-console.log('Sample posts inserted');
+// Get nation ids
+const nationRows = await sql`SELECT id, name FROM nations`;
+const nationMap = {};
+nationRows.forEach(n => nationMap[n.name] = n.id);
+
+// Insert sample travel items
+const travelItems = [
+  { nation: 'Japan', name: 'Mount Fuji', description: 'Iconic volcano and symbol of Japan', image_url: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=400' },
+  { nation: 'France', name: 'Eiffel Tower', description: 'Famous iron lattice tower in Paris', image_url: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400' },
+  { nation: 'Italy', name: 'Colosseum', description: 'Ancient amphitheater in Rome', image_url: 'https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=400' },
+  { nation: 'Mexico', name: 'Chichen Itza', description: 'Mayan pyramid in Yucatan', image_url: 'https://images.unsplash.com/photo-1518638150340-f706e866195a?w=400' },
+  { nation: 'India', name: 'Taj Mahal', description: 'Mughal mausoleum in Agra', image_url: 'https://images.unsplash.com/photo-1587135941948-670b381f08ce?w=400' },
+  { nation: 'Brazil', name: 'Christ the Redeemer', description: 'Statue of Jesus Christ in Rio', image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=400' }
+];
+
+for (const item of travelItems) {
+  const nationId = nationMap[item.nation];
+  if (nationId) {
+    await sql`INSERT INTO travel_items (nation_id, name, description, image_url) VALUES (${nationId}, ${item.name}, ${item.description}, ${item.image_url})`;
+  }
+}
+
+// Insert sample food items
+const foodItems = [
+  { nation: 'Japan', name: 'Sushi', description: 'Vinegared rice with seafood', image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400' },
+  { nation: 'France', name: 'Croissant', description: 'Buttery flaky pastry', image_url: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400' },
+  { nation: 'Italy', name: 'Pizza Margherita', description: 'Tomato, mozzarella, basil pizza', image_url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400' },
+  { nation: 'Mexico', name: 'Tacos', description: 'Corn tortillas with fillings', image_url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400' },
+  { nation: 'India', name: 'Butter Chicken', description: 'Creamy tomato curry with chicken', image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400' },
+  { nation: 'Brazil', name: 'Feijoada', description: 'Black bean stew with pork', image_url: 'https://images.unsplash.com/photo-1541599468348-e96984315621?w=400' }
+];
+
+for (const item of foodItems) {
+  const nationId = nationMap[item.nation];
+  if (nationId) {
+    await sql`INSERT INTO food_items (nation_id, name, description, image_url) VALUES (${nationId}, ${item.name}, ${item.description}, ${item.image_url})`;
+  }
+}
+
+// Insert sample toy items
+const toyItems = [
+  { nation: 'Japan', name: 'Tamagotchi', description: 'Digital pet handheld game', image_url: 'https://images.unsplash.com/photo-1558877385-1199c1af4e0e?w=400' },
+  { nation: 'France', name: 'Petit Ours Brun', description: 'Teddy bear plush toy', image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400' },
+  { nation: 'Italy', name: 'Pinocchio Marionette', description: 'Wooden puppet from the story', image_url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400' },
+  { nation: 'Mexico', name: 'Piñata', description: 'Decorated container filled with treats', image_url: 'https://images.unsplash.com/photo-1541599468348-e96984315621?w=400' },
+  { nation: 'India', name: 'Gully Danda', description: 'Traditional stick and ball game', image_url: 'https://images.unsplash.com/photo-1587135941948-670b381f08ce?w=400' },
+  { nation: 'Brazil', name: 'Capoeira Angoleiro', description: 'Musical instrument for capoeira', image_url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=400' }
+];
+
+for (const item of toyItems) {
+  const nationId = nationMap[item.nation];
+  if (nationId) {
+    await sql`INSERT INTO toy_items (nation_id, name, description, image_url) VALUES (${nationId}, ${item.name}, ${item.description}, ${item.image_url})`;
+  }
+}
+
+console.log('Sample data inserted');

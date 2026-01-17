@@ -1,7 +1,5 @@
-'use client';
-
-import Image from "next/image";
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 interface Nation {
   id: number;
@@ -35,7 +33,7 @@ export default function Home() {
 
   const fetchNations = async () => {
     try {
-      const res = await fetch('/api/nations');
+      const res = await fetch('/.netlify/functions/nations');
       if (res.ok) {
         const data = await res.json();
         setNations(data);
@@ -48,9 +46,9 @@ export default function Home() {
   const fetchItems = async () => {
     try {
       const [travelRes, foodRes, toyRes] = await Promise.all([
-        fetch('/api/travel'),
-        fetch('/api/food'),
-        fetch('/api/toy')
+        fetch('/.netlify/functions/travel'),
+        fetch('/.netlify/functions/food'),
+        fetch('/.netlify/functions/toy')
       ]);
       if (travelRes.ok) setTravelItems(await travelRes.json());
       if (foodRes.ok) setFoodItems(await foodRes.json());
@@ -93,11 +91,11 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">House of Gon</h1>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <a href="/" className="text-gray-900 hover:text-gray-600">Home</a>
-              <a href="/travel" className="text-gray-900 hover:text-gray-600">Travel</a>
-              <a href="/food" className="text-gray-900 hover:text-gray-600">Food</a>
-              <a href="/toy" className="text-gray-900 hover:text-gray-600">Toy</a>
-              <a href="/admin" className="text-gray-900 hover:text-gray-600">Admin</a>
+              <Link to="/" className="text-gray-900 hover:text-gray-600">Home</Link>
+              <Link to="/travel" className="text-gray-900 hover:text-gray-600">Travel</Link>
+              <Link to="/food" className="text-gray-900 hover:text-gray-600">Food</Link>
+              <Link to="/toy" className="text-gray-900 hover:text-gray-600">Toy</Link>
+              <Link to="/admin" className="text-gray-900 hover:text-gray-600">Admin</Link>
             </nav>
           </div>
         </div>

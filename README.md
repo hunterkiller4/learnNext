@@ -1,63 +1,159 @@
-This is a [Next.js](https://nextjs.org) project for House of Gon, a travel blog website.
+# House of Gon
 
-## Getting Started
+A modern web application built with Vite, React, and TypeScript for exploring nations' travel destinations, foods, and toys.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Routing**: React Router
+- **Backend**: Netlify Functions (serverless)
+- **Database**: Netlify DB (Postgres via Neon)
+- **Authentication**: Netlify Identity
+- **Testing**: Vitest + React Testing Library
+- **CI/CD**: GitHub Actions
+- **Deployment**: Netlify
 
 ## Features
 
-- Travel blog with Netlify DB (serverless Postgres)
-- API routes for managing blog posts
-- Authentication with Netlify Identity
-- Responsive design with Tailwind CSS
-- Deployed on Netlify
+- 🗺️ **Travel Destinations**: Explore iconic travel spots from nations around the world
+- 🍜 **Culinary Delights**: Discover authentic foods from different cultures
+- 🧸 **Playful Toys**: Find fun toys and games from various nations
+- 🔐 **Admin Dashboard**: Protected admin interface for managing content
+- 🎨 **Responsive Design**: Mobile-first design with Tailwind CSS
+- 🧪 **Unit Testing**: Comprehensive test suite with Vitest
+- 🚀 **CI/CD**: Automated testing and deployment with GitHub Actions
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- Netlify CLI (optional, for local development)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/house-of-gon.git
+cd house-of-gon
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open [http://localhost:5173](http://localhost:5173) to view the app.
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run test         # Run tests
+npm run test:ui      # Run tests with UI
+npm run test:run     # Run tests once
+npm run lint         # Run ESLint
+```
 
 ## Database Setup
 
-This app uses Netlify DB for the database. To set up:
+This app uses Netlify DB (serverless Postgres). To set up:
 
-1. In your Netlify dashboard, enable Netlify DB for your site.
-2. The DATABASE_URL environment variable will be automatically set.
-3. Run `node seed.js` to populate sample data (requires DATABASE_URL set).
+1. In your Netlify dashboard, enable Netlify DB for your site
+2. The `NETLIFY_DATABASE_URL` environment variable will be automatically set
+3. Run the seed script to populate sample data:
+```bash
+node seed.js
+```
 
 ## Authentication Setup
 
-This app uses Netlify Identity for authentication. To set up:
+This app uses Netlify Identity for authentication:
 
-1. In your Netlify dashboard, enable Identity for your site.
-2. Configure Identity settings (e.g., allow signup, email templates).
-3. The NETLIFY_IDENTITY_SECRET environment variable will be automatically set for server-side verification.
-4. For local development, you may need to set these variables manually or use Netlify Dev.
+1. In your Netlify dashboard, enable Identity for your site
+2. Configure Identity settings (allow signup, email templates, etc.)
+3. The `JWT_SECRET` environment variable will be automatically set
 
-Logged-in users can add new blog posts.
+## Testing
 
-## Learn More
+Run the test suite:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run test          # Interactive mode
+npm run test:run      # Run once
+npm run test:ui       # With UI
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── pages/           # React components (pages)
+├── test/            # Test utilities
+├── App.tsx          # Main app component
+├── main.tsx         # Entry point
+└── globals.css      # Global styles
 
-## Deploy on Netlify
+netlify/
+└── functions/       # Serverless functions
 
-The easiest way to deploy your Next.js app is to use Netlify.
+.github/
+└── workflows/       # GitHub Actions
+```
 
-Connect your GitHub repository to Netlify and deploy. Enable Netlify DB and Identity in the site settings.
+## API Endpoints
+
+- `GET/POST /.netlify/functions/nations` - Manage nations
+- `GET/POST /.netlify/functions/travel` - Travel items
+- `GET/POST /.netlify/functions/food` - Food items
+- `GET/POST /.netlify/functions/toy` - Toy items
+
+## Deployment
+
+### Automatic Deployment (GitHub Actions)
+
+1. Push to the `main` branch
+2. GitHub Actions will:
+   - Run tests and linting
+   - Build the application
+   - Deploy to Netlify
+
+### Manual Deployment
+
+1. Build the project:
+```bash
+npm run build
+```
+
+2. Deploy to Netlify:
+```bash
+netlify deploy --prod --dir=dist
+```
+
+## Environment Variables
+
+Required environment variables (automatically set by Netlify):
+
+- `NETLIFY_DATABASE_URL` - Database connection string
+- `JWT_SECRET` - JWT signing secret for authentication
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new features
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
