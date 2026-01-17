@@ -14,15 +14,75 @@ interface Post {
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [category, setCategory] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     fetchPosts();
+
+    // Load Netlify Identity
+    const script = document.createElement('script');
+    script.src = 'https://identity.netlify.com/v1/netlify-identity-widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.init();
+        window.netlifyIdentity.on('login', (user: any) => setUser(user));
+        window.netlifyIdentity.on('logout', () => setUser(null));
+        setUser(window.netlifyIdentity.currentUser());
+      }
+    };
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
   }, []);
 
   const fetchPosts = async () => {
     const res = await fetch('/api/posts');
     const data = await res.json();
     setPosts(data);
+  };
+
+  const addPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    const token = user.jwt();
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, content, category, image_url: imageUrl }),
+    });
+    if (res.ok) {
+      setTitle('');
+      setContent('');
+      setCategory('');
+      setImageUrl('');
+      fetchPosts();
+    }
+  };
+
+  const login = () => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.open();
+    }
+  };
+
+  const logout = () => {
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.logout();
+    }
   };
 
   return (
@@ -34,13 +94,24 @@ export default function Home() {
             <div className="flex items-center">
               <h1 className="text-2xl font-bold text-gray-900">House of Gon</h1>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-900 hover:text-gray-600">Home</a>
-              <a href="#" className="text-gray-900 hover:text-gray-600">Destinations</a>
-              <a href="#" className="text-gray-900 hover:text-gray-600">Blog</a>
-              <a href="#" className="text-gray-900 hover:text-gray-600">About</a>
-              <a href="#" className="text-gray-900 hover:text-gray-600">Contact</a>
-            </nav>
+            <div className="flex items-center space-x-4">
+              <nav className="hidden md:flex space-x-8">
+                <a href="#" className="text-gray-900 hover:text-gray-600">Home</a>
+                <a href="#" className="text-gray-900 hover:text-gray-600">Destinations</a>
+                <a href="#" className="text-gray-900 hover:text-gray-600">Blog</a>
+                <a href="#" className="text-gray-900 hover:text-gray-600">About</a>
+                <a href="#" className="text-gray-900 hover:text-gray-600">Contact</a>
+              </nav>
+              {user ? (
+                <button onClick={logout} className="bg-red-500 text-white px-4 py-2 rounded">
+                  Logout
+                </button>
+              ) : (
+                <button onClick={login} className="bg-blue-500 text-white px-4 py-2 rounded">
+                  Login
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -53,6 +124,56 @@ export default function Home() {
           <a href="#posts" className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">Explore Posts</a>
         </div>
       </section>
+
+      {/* Add Post Form (if logged in) */}
+      {user && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h3 className="text-2xl font-bold mb-4">Add New Post</h3>
+          <form onSubmit={addPost} className="bg-white p-6 rounded-lg shadow-md">
+            <div className="mb-4">
+              <label className="block text-gray-700">Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Content</label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+                rows={4}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Category</label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Image URL</label>
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="w-full px-3 py-2 border rounded"
+              />
+            </div>
+            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+              Add Post
+            </button>
+          </form>
+        </section>
+      )}
 
       {/* Blog Posts */}
       <section id="posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -85,4 +206,11 @@ export default function Home() {
       </footer>
     </div>
   );
+}
+
+// Declare global window
+declare global {
+  interface Window {
+    netlifyIdentity: any;
+  }
 }

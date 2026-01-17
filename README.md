@@ -24,6 +24,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 - Travel blog with Netlify DB (serverless Postgres)
 - API routes for managing blog posts
+- Authentication with Netlify Identity
 - Responsive design with Tailwind CSS
 - Deployed on Netlify
 
@@ -35,7 +36,16 @@ This app uses Netlify DB for the database. To set up:
 2. The DATABASE_URL environment variable will be automatically set.
 3. Run `node seed.js` to populate sample data (requires DATABASE_URL set).
 
-For local development, you can set DATABASE_URL to a local Postgres instance or use a service like Neon.
+## Authentication Setup
+
+This app uses Netlify Identity for authentication. To set up:
+
+1. In your Netlify dashboard, enable Identity for your site.
+2. Configure Identity settings (e.g., allow signup, email templates).
+3. The NETLIFY_IDENTITY_SECRET environment variable will be automatically set for server-side verification.
+4. For local development, you may need to set these variables manually or use Netlify Dev.
+
+Logged-in users can add new blog posts.
 
 ## Learn More
 
@@ -50,4 +60,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use Netlify.
 
-Connect your GitHub repository to Netlify and deploy. Enable Netlify DB in the site settings.
+Connect your GitHub repository to Netlify and deploy. Enable Netlify DB and Identity in the site settings.

@@ -1,5 +1,20 @@
 import { NextResponse } from 'next/server';
 import sql from '../../../lib/db';
+import jwt from 'jsonwebtoken';
+
+function verifyToken(request) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  const token = authHeader.substring(7);
+  try {
+    const decoded = jwt.verify(token, process.env.NETLIFY_IDENTITY_SECRET);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
 
 export async function GET() {
   try {
@@ -11,6 +26,11 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const user = verifyToken(request);
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const { title, content, category, image_url } = await request.json();
     const result = await sql`INSERT INTO posts (title, content, category, image_url) VALUES (${title}, ${content}, ${category}, ${image_url}) RETURNING id`;
